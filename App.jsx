@@ -1,16 +1,15 @@
+
 import React, { useState } from "react";
 
 const MARGIN_PH = 6;
 const DEFAULT_REPS = ["Mia", "Adam", "Carmen", "Kye"];
 const METRICS = [
-  "Outbound calls / emails",
-  "Decision-maker conversations",
-  "Meetings / site visits booked",
-  "Proposals / terms sent",
-  "New client sign-ups",
-  "First-fill shifts placed",
+  "Service calls per day",
+  "Reactivated clients",
+  "Days of client meetings per month",
+  "New clients per month",
 ];
-const METRIC_SHORT = ["Outbound", "DM Conversations", "Meetings", "Proposals", "Sign-ups", "First Fills"];
+const METRIC_SHORT = ["Service Calls", "Reactivated", "Meeting Days", "New Clients"];
 const PIPELINE_STAGES = ["Cold / Untouched", "Contacted", "Meeting Booked", "Terms Sent", "Signed (Awaiting First Fill)", "Active (Billing)"];
 const PIPE_SHORT = ["Cold", "Contacted", "Meeting", "Terms Sent", "Signed", "Active"];
 const PIPE_COLORS = ["#8E8E93", "#FF9500", "#FF3B30", "#AF52DE", "#34C759", "#007AFF"];
@@ -143,7 +142,7 @@ export default function App() {
         </div>
 
         {/* Activity cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 20 }}>
           {METRICS.map((m, i) => {
             const d = repMetric(rep, m);
             const col = pctColor(d.pct);
@@ -690,12 +689,15 @@ export default function App() {
               <tbody>
                 {METRICS.map((m, idx) => {
                   const t = parseInt(data.activity[r]?.target[m]) || 0;
+                  const a = parseInt(data.activity[r]?.actual[m]) || 0;
+                  const p = t > 0 ? Math.round((a / t) * 100) : null;
+                  const col = p === null ? "#1D1D1F" : p >= 100 ? "#34C759" : p >= 75 ? "#FF9500" : "#FF3B30";
                   return (
                     <tr key={m} style={{ borderBottom: "1px solid #E5E5EA", background: idx % 2 === 0 ? "#F9F9FB" : "#fff" }}>
                       <td style={{ padding: "7px 10px" }}>{m}</td>
                       <td style={{ padding: "7px 10px", textAlign: "center", fontWeight: 600 }}>{t || ""}</td>
-                      <td style={{ padding: "7px 10px", textAlign: "center", borderLeft: "1px solid #E5E5EA", borderRight: "1px solid #E5E5EA" }}></td>
-                      <td style={{ padding: "7px 10px", textAlign: "center" }}></td>
+                      <td style={{ padding: "7px 10px", textAlign: "center", fontWeight: 600, color: col, borderLeft: "1px solid #E5E5EA", borderRight: "1px solid #E5E5EA" }}>{a || ""}</td>
+                      <td style={{ padding: "7px 10px", textAlign: "center", fontWeight: 600, color: col }}>{p !== null ? `${p}%` : ""}</td>
                     </tr>
                   );
                 })}
